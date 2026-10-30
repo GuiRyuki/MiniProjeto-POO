@@ -56,6 +56,26 @@ namespace ProjetoPOO
             Console.WriteLine($"Login do Lucas com 'lucas123': {discente.Autenticar("lucas123")}");
             Console.WriteLine($"Login do Lucas com 'errada':   {discente.Autenticar("errada")}");
             // new Usuario(...) não compila: Usuario é abstrata
+
+            // ===== Missão 4: Polimorfismo Dinâmico =====
+            Console.WriteLine();
+            Console.WriteLine("===== Missão 4: Sessões de Estudo =====");
+
+            List<SessaoEstudo> sessoes = new List<SessaoEstudo>
+            {
+                new SessaoPomodoro(poo, 50, 2),
+                new SessaoExercicios(matematica, 30, 10, 8),
+                new SessaoLeitura(fullStack, 40, 20, true)
+            };
+
+            int xpTotalSessoes = 0;
+            foreach (SessaoEstudo sessao in sessoes)
+            {
+                // Nenhum if testando o tipo: cada objeto sabe calcular o próprio XP
+                Console.WriteLine(sessao.GerarFeedback());
+                xpTotalSessoes += sessao.CalcularXp();
+            }
+            Console.WriteLine($"XP total das sessões: {xpTotalSessoes}");
         }
     }
 }
