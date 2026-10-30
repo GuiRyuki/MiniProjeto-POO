@@ -76,6 +76,22 @@ namespace ProjetoPOO
                 xpTotalSessoes += sessao.CalcularXp();
             }
             Console.WriteLine($"XP total das sessões: {xpTotalSessoes}");
+
+            // ===== Missão 5: Polimorfismo Estático (Sobrecarga) =====
+            Console.WriteLine();
+            Console.WriteLine("===== Missão 5: Registro de Estudo =====");
+            Console.WriteLine($"Antes:  {discente.GerarPainelResumo()}");
+
+            discente.RegistrarEstudo(sessoes[0]);                // Forma 1: sessão pronta
+            discente.RegistrarEstudo(poo, 50);                   // Forma 2: atalho Pomodoro
+            discente.RegistrarEstudo(fullStack, 14, 16, 30);     // Forma 3: das 14h às 16h
+            discente.RegistrarEstudo(fullStack, 16, 14, 30);     // Forma 3 inválida: ignorada
+
+            foreach (SessaoEstudo sessao in discente.GetHistorico())
+            {
+                Console.WriteLine($"  {sessao.GerarFeedback()}");
+            }
+            Console.WriteLine($"Depois: {discente.GerarPainelResumo()}");
         }
     }
 }
