@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ProjetoPOO
+﻿namespace ProjetoPOO
 {
-    internal class MetaEstudo
+    public class MetaEstudo
     {
         private int metaMinutosSemana;
         private int minutosCumpridos = 0;
@@ -13,6 +9,10 @@ namespace ProjetoPOO
         {
             RedefinirMeta(metaInicial);
         }
+
+        // Somente leitura: não existe SetMinutosCumpridos
+        public int GetMinutosCumpridos() { return minutosCumpridos; }
+        public int GetMetaMinutosSemana() { return metaMinutosSemana; }
 
         public bool RegistrarAvanco(int minutos)
         {
@@ -26,7 +26,7 @@ namespace ProjetoPOO
 
         public void RedefinirMeta(int novaMeta)
         {
-           if (novaMeta < 30)
+            if (novaMeta < 30)
             {
                 novaMeta = 30;
             }
@@ -49,12 +49,7 @@ namespace ProjetoPOO
 
         public bool EstaCumprida()
         {
-            if (minutosCumpridos >= metaMinutosSemana)
-            {
-                return true;
-            }
-
-            return false;
+            return minutosCumpridos >= metaMinutosSemana;
         }
     }
 }

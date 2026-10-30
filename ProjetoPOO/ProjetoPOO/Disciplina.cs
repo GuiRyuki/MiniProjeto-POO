@@ -1,32 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ProjetoPOO
+﻿namespace ProjetoPOO
 {
-    internal class Disciplina
+    public class Disciplina
     {
-        public string Codigo { get; private set; }
-        public string Nome { get; private set; }
-        public string Categoria { get; private set; }
-        public int CargaHoraria { get; private set; }
+        private string codigo;
+        private string nome;
+        private string categoria;
+        private int cargaHorariaSemanalHoras;
 
-        public Disciplina(string codigo, string nome, string categoria, int cargaHoraria) 
+        public Disciplina(string codigo, string nome, string categoria, int cargaHorariaSemanalHoras)
         {
-            this.Codigo = codigo;
-            this.Nome = nome;
-            this.Categoria = categoria;
-            this.CargaHoraria = cargaHoraria;
+            this.codigo = codigo;
+            this.nome = nome;
+            this.categoria = categoria;
+
+            // Regra da Missão 1: carga inválida assume o padrão de 2 horas
+            if (cargaHorariaSemanalHoras <= 0)
+            {
+                cargaHorariaSemanalHoras = 2;
+            }
+            this.cargaHorariaSemanalHoras = cargaHorariaSemanalHoras;
         }
 
-        public int CalcularCargaHorariaEmMinutos()
+        public string GetCodigo() { return codigo; }
+        public string GetNome() { return nome; }
+        public string GetCategoria() { return categoria; }
+        public int GetCargaHorariaSemanalHoras() { return cargaHorariaSemanalHoras; }
+
+        public int CalcularCargaEmMinutos()
         {
-            return this.CargaHoraria * 60;
+            return cargaHorariaSemanalHoras * 60;
         }
 
-        public void ExibirResumo()
+        public string ExibirResumo()
         {
-            Console.WriteLine($"[ADS201] Programação Orientada a Objetos (Computação) - {this.CargaHoraria} horas");
+            return $"[{codigo}] {nome} ({categoria}) — {cargaHorariaSemanalHoras}h/semana ({CalcularCargaEmMinutos()} min)";
         }
     }
 }
