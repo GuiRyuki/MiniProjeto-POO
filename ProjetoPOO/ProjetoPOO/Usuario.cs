@@ -1,23 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
-namespace ProjetoPOO
+﻿namespace ProjetoPOO
 {
     public abstract class Usuario
     {
-        public string Name { get; private set; }
-        public string Email { get; private set; }
-        protected string Password { get; private set; }
+        private int id;
+        private string nome;
+        private string email;
+        private string senha;
 
-        protected Usuario(string name, string email, string password)
+        protected Usuario(int id, string nome, string email, string senha)
         {
-            this.Name = name;
-            this.Email = email;
-            this.Password = password;
+            this.id = id;
+            this.nome = nome;
+            this.email = email;
+            this.senha = senha;
         }
 
+        public int GetId() { return id; }
+        public string GetNome() { return nome; }
+        public string GetEmail() { return email; }
+        // Sem GetSenha(): a senha nunca sai da classe, só é comparada aqui dentro
 
+        public bool Autenticar(string senhaDigitada)
+        {
+            return senha == senhaDigitada;
+        }
+
+        public abstract string ObterTipoPerfil();
+        public abstract string GerarPainelResumo();
     }
 }

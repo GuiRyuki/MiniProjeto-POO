@@ -34,6 +34,28 @@ namespace ProjetoPOO
 
             MetaEstudo metaSabotada = new MetaEstudo(-100);
             Console.WriteLine($"Meta criada com -100 foi ajustada para: {metaSabotada.GetMetaMinutosSemana()} min");
+
+            // ===== Missão 3: Classe Abstrata e Herança =====
+            Console.WriteLine();
+            Console.WriteLine("===== Missão 3: Perfis de Usuário =====");
+
+            Administrador admin = new Administrador(1, "Profa. Helena", "helena@fecap.br", "admin123", "Coordenação PI");
+            Responsavel responsavel = new Responsavel(2, "Carlos Silva", "carlos@email.com", "carlos123", "Pai");
+            Discente discente = new Discente(3, "Lucas Silva", "lucas.silva@edu.fecap.br", "lucas123", "RA-2026101");
+
+            discente.AdicionarXp(50);
+            discente.AdicionarXp(-30); // ignorado
+
+            // Lista do tipo da classe mãe guardando objetos das 3 filhas
+            List<Usuario> usuarios = new List<Usuario> { admin, responsavel, discente };
+            foreach (Usuario usuario in usuarios)
+            {
+                Console.WriteLine(usuario.GerarPainelResumo());
+            }
+
+            Console.WriteLine($"Login do Lucas com 'lucas123': {discente.Autenticar("lucas123")}");
+            Console.WriteLine($"Login do Lucas com 'errada':   {discente.Autenticar("errada")}");
+            // new Usuario(...) não compila: Usuario é abstrata
         }
     }
 }
