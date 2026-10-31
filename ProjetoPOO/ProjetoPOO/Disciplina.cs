@@ -35,5 +35,11 @@
         {
             return $"[{codigo}] {nome} ({categoria}) — {cargaHorariaSemanalHoras}h/semana ({CalcularCargaEmMinutos()} min)";
         }
+
+        // Sobrescreve o ToString() de object: é o texto que o ComboBox da tela exibe
+        public override string ToString()
+        {
+            return $"[{codigo}] {nome}";
+        }
     }
 }
