@@ -92,6 +92,30 @@ namespace ProjetoPOO
                 Console.WriteLine($"  {sessao.GerarFeedback()}");
             }
             Console.WriteLine($"Depois: {discente.GerarPainelResumo()}");
+
+            // ===== Missão 6: Interfaces =====
+            Console.WriteLine();
+            Console.WriteLine("===== Missão 6: Interfaces =====");
+
+            // Mesma chamada, canais diferentes: o código só conhece o contrato INotificador
+            List<INotificador> notificadores = new List<INotificador>
+            {
+                new NotificadorEmail(),
+                new NotificadorWhatsApp()
+            };
+            foreach (INotificador notificador in notificadores)
+            {
+                bool enviado = notificador.EnviarAlerta(responsavel.GetEmail(), $"{discente.GetNome()} está com {discente.GetXpTotal()} XP!");
+                Console.WriteLine($"  Enviado por {notificador.ObterCanal()}? {enviado}");
+            }
+            Console.WriteLine($"  E-mail para destinatário inválido? {new NotificadorEmail().EnviarAlerta("sem-arroba", "teste")}");
+
+            // Classes de famílias diferentes, tratadas pelo mesmo contrato IExportavelJson
+            List<IExportavelJson> exportaveis = new List<IExportavelJson> { sessoes[0], sessoes[1], meta };
+            foreach (IExportavelJson item in exportaveis)
+            {
+                Console.WriteLine(item.ParaJson());
+            }
         }
     }
 }

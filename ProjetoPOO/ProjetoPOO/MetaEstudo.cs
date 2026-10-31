@@ -1,6 +1,8 @@
-﻿namespace ProjetoPOO
+﻿using System.Text.Json;
+
+namespace ProjetoPOO
 {
-    public class MetaEstudo
+    public class MetaEstudo : IExportavelJson
     {
         private int metaMinutosSemana;
         private int minutosCumpridos = 0;
@@ -50,6 +52,18 @@
         public bool EstaCumprida()
         {
             return minutosCumpridos >= metaMinutosSemana;
+        }
+
+        public string ParaJson()
+        {
+            var dados = new
+            {
+                metaMinutosSemana = metaMinutosSemana,
+                minutosCumpridos = minutosCumpridos,
+                percentual = CalcularPercentual(),
+                cumprida = EstaCumprida()
+            };
+            return JsonSerializer.Serialize(dados);
         }
     }
 }
