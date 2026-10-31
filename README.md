@@ -1,5 +1,5 @@
 # MiniProjeto-POO
-Oficina Prática PBL — Plataforma de Apoio ao Estudo (**FecapStudy**), Aula 9 de POO.
+Oficina Prática PBL — Plataforma de Apoio ao Estudo (**FecapStudy**).
 
 ## Estrutura
 
