@@ -145,6 +145,28 @@ namespace ProjetoPOO
 
             trilhaPi = null!; // "apaga" a trilha...
             Console.WriteLine($"Trilha PI apagada, mas a disciplina continua existindo: {poo.ExibirResumo()}");
+
+            // ===== Missão 8: Composição e Dependência =====
+            Console.WriteLine();
+            Console.WriteLine("===== Missão 8: Composição e Dependência =====");
+
+            // Composição: só passamos dados; o PlanoEstudo cria os ItemCronograma lá dentro
+            PlanoEstudo plano = discente.GetPlanoEstudo();
+            plano.AdicionarItem("Segunda", 60);
+            plano.AdicionarItem("Quarta", 90);
+            plano.AdicionarItem("Sexta", 50);
+            Console.WriteLine($"Item inválido (-30 min) aceito? {plano.AdicionarItem("Sábado", -30)}");
+            Console.WriteLine($"Plano do Lucas: {string.Join(" | ", plano.ListarItens())} — total {plano.CalcularTotalMinutos()} min");
+
+            // Dependência: o serviço recebe tudo por parâmetro e não guarda nada
+            MetaEstudo metaLucas = responsavel.ObterMeta(discente)!;
+            ServicoAlertaResponsavel servicoAlerta = new ServicoAlertaResponsavel();
+
+            metaLucas.RegistrarAvanco(120);
+            servicoAlerta.AvaliarDiscente(discente, metaLucas, responsavel, new NotificadorEmail());
+
+            metaLucas.RegistrarAvanco(100);
+            servicoAlerta.AvaliarDiscente(discente, metaLucas, responsavel, new NotificadorWhatsApp());
         }
     }
 }

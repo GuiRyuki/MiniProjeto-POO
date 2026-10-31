@@ -5,6 +5,7 @@ namespace ProjetoPOO
         private string ra;
         private int xpTotal = 0;
         private List<SessaoEstudo> historico = new List<SessaoEstudo>();
+        private PlanoEstudo plano = new PlanoEstudo(); // cada discente nasce com seu próprio plano
 
         public Discente(int id, string nome, string email, string senha, string ra)
             : base(id, nome, email, senha)
@@ -14,6 +15,7 @@ namespace ProjetoPOO
 
         public string GetRa() { return ra; }
         public int GetXpTotal() { return xpTotal; }
+        public PlanoEstudo GetPlanoEstudo() { return plano; }
 
         // Somente leitura: quem está de fora consegue listar, mas não adicionar nem remover
         public IReadOnlyList<SessaoEstudo> GetHistorico() { return historico.AsReadOnly(); }
