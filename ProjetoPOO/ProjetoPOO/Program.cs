@@ -116,6 +116,35 @@ namespace ProjetoPOO
             {
                 Console.WriteLine(item.ParaJson());
             }
+
+            // ===== Missão 7: Associação e Agregação =====
+            Console.WriteLine();
+            Console.WriteLine("===== Missão 7: Associação e Agregação =====");
+
+            // Associação: Responsavel ——> Discente (os dois já existiam antes do vínculo)
+            Discente mariana = new Discente(4, "Mariana Costa", "mariana.costa@edu.fecap.br", "mari123", "RA-2026102");
+            Console.WriteLine($"Vincular Lucas:              {responsavel.VincularDiscente(discente)}");
+            Console.WriteLine($"Vincular Mariana:            {responsavel.VincularDiscente(mariana)}");
+            Console.WriteLine($"Vincular Lucas de novo:      {responsavel.VincularDiscente(discente)}");
+            responsavel.DefinirMeta(discente, 200);
+            Console.WriteLine($"Meta do Lucas definida pelo responsável: {responsavel.ObterMeta(discente)?.GetMetaMinutosSemana()} min");
+            Console.WriteLine(responsavel.GerarPainelResumo());
+
+            // Agregação: TrilhaEstudo ◇── Disciplina (a mesma disciplina em duas trilhas)
+            TrilhaEstudo trilhaAds = new TrilhaEstudo("Trilha 2º Semestre ADS", admin);
+            trilhaAds.AdicionarDisciplina(poo);
+            trilhaAds.AdicionarDisciplina(matematica);
+            trilhaAds.AdicionarDisciplina(fullStack);
+
+            TrilhaEstudo trilhaPi = new TrilhaEstudo("Trilha Projeto Interdisciplinar", admin);
+            trilhaPi.AdicionarDisciplina(poo); // mesma instância de poo, sem copiar
+            trilhaPi.AdicionarDisciplina(fullStack);
+
+            Console.WriteLine(trilhaAds.ExibirResumo());
+            Console.WriteLine(trilhaPi.ExibirResumo());
+
+            trilhaPi = null!; // "apaga" a trilha...
+            Console.WriteLine($"Trilha PI apagada, mas a disciplina continua existindo: {poo.ExibirResumo()}");
         }
     }
 }
