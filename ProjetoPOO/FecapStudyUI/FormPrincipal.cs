@@ -10,6 +10,7 @@ namespace FecapStudyUI
         private readonly Discente discente;
         private readonly MetaEstudo meta;
         private readonly ServicoAlertaResponsavel servicoAlerta = new ServicoAlertaResponsavel();
+        private readonly ClienteBackendEstudo clienteBackend = new ClienteBackendEstudo(); // Missão 10
 
         // ===== Controles da tela =====
         private readonly Label lblDiscente = new Label();
@@ -27,6 +28,11 @@ namespace FecapStudyUI
         private readonly Label lblMeta = new Label();
         private readonly ListBox lstHistorico = new ListBox();
         private readonly Button btnNotificar = new Button();
+        private readonly Label lblSincronizacao = new Label();
+        private readonly Label lblStatusServidor = new Label();
+        private readonly Button btnCarregarServidor = new Button();
+        private readonly Label lblRelatorio = new Label();
+        private readonly ListBox lstServidor = new ListBox();
 
         public FormPrincipal()
         {
@@ -46,6 +52,9 @@ namespace FecapStudyUI
             MontarTela();
             AtualizarCamposExtras();
             AtualizarTela();
+
+            // Assim que a janela aparece, verifica se o backend está rodando
+            Shown += async (s, e) => await AtualizarStatusServidorAsync();
         }
 
         // ===== Montagem dos controles =====
@@ -54,7 +63,7 @@ namespace FecapStudyUI
         {
             Text = "FecapStudy — Plataforma de Apoio ao Estudo";
             Font = new Font("Segoe UI", 10F);
-            ClientSize = new Size(720, 640);
+            ClientSize = new Size(1180, 640);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
@@ -79,6 +88,7 @@ namespace FecapStudyUI
             Posicionar(grpSessao, numTotalQuestoes, 395, 136, 100, 28);
             Posicionar(grpSessao, chkResumo, 260, 138, 200, 26);
             Posicionar(grpSessao, btnRegistrar, 140, 172, 200, 32);
+            Posicionar(grpSessao, lblSincronizacao, 352, 178, 330, 24);
 
             cmbDisciplina.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbDisciplina.Items.AddRange(disciplinas.ToArray());
@@ -119,6 +129,18 @@ namespace FecapStudyUI
 
             btnNotificar.Text = "Notificar Responsável";
             btnNotificar.Click += BtnNotificar_Click;
+
+            // Servidor (Missão 10)
+            GroupBox grpServidor = CriarGrupo("Servidor (Backend C# + MySQL)", 720, 10, 448, 620);
+            Posicionar(grpServidor, lblStatusServidor, 14, 28, 420, 24);
+            Posicionar(grpServidor, btnCarregarServidor, 14, 58, 280, 32);
+            Posicionar(grpServidor, lblRelatorio, 14, 100, 420, 90);
+            Posicionar(grpServidor, lstServidor, 14, 196, 420, 410);
+            lstServidor.HorizontalScrollbar = true;
+
+            lblStatusServidor.Text = "Verificando servidor...";
+            btnCarregarServidor.Text = "Carregar Histórico do Servidor";
+            btnCarregarServidor.Click += async (s, e) => await CarregarDadosServidorAsync();
         }
 
         private GroupBox CriarGrupo(string titulo, int x, int y, int largura, int altura)
@@ -192,7 +214,7 @@ namespace FecapStudyUI
             return new SessaoLeitura(disciplina, minutos, extra, chkResumo.Checked);
         }
 
-        private void BtnRegistrar_Click(object? sender, EventArgs e)
+        private async void BtnRegistrar_Click(object? sender, EventArgs e)
         {
             // O clique só lê a tela e pede aos objetos que façam o trabalho (nada de fórmula de XP aqui)
             Disciplina disciplina = (Disciplina)cmbDisciplina.SelectedItem!;
@@ -209,6 +231,70 @@ namespace FecapStudyUI
             discente.RegistrarEstudo(sessao);
             lstHistorico.Items.Add(sessao.GerarFeedback());
             AtualizarTela();
+
+            // Missão 10: além da memória, grava no backend (POST /api/sessoes)
+            btnRegistrar.Enabled = false;
+            lblSincronizacao.Text = "Enviando ao servidor...";
+            bool salvo = await clienteBackend.SalvarSessaoAsync(discente, sessao);
+            btnRegistrar.Enabled = true;
+
+            if (salvo)
+            {
+                lblSincronizacao.ForeColor = Color.ForestGreen;
+                lblSincronizacao.Text = "Sessão salva no servidor ✔";
+                await CarregarDadosServidorAsync();
+            }
+            else
+            {
+                lblSincronizacao.ForeColor = Color.Firebrick;
+                lblSincronizacao.Text = "Servidor offline: sessão ficou só na memória";
+                await AtualizarStatusServidorAsync();
+            }
+        }
+
+        private async Task AtualizarStatusServidorAsync()
+        {
+            StatusServidor? status = await clienteBackend.ObterStatusAsync();
+            if (status == null)
+            {
+                lblStatusServidor.ForeColor = Color.Firebrick;
+                lblStatusServidor.Text = "Offline — execute o Backend\\iniciar_backend.bat";
+            }
+            else
+            {
+                lblStatusServidor.ForeColor = Color.ForestGreen;
+                lblStatusServidor.Text = $"Online — {status.ModoBanco}";
+            }
+        }
+
+        // GET /api/sessoes e GET /api/relatorio/{discente}
+        private async Task CarregarDadosServidorAsync()
+        {
+            btnCarregarServidor.Enabled = false;
+            List<SessaoServidor>? sessoes = await clienteBackend.ListarSessoesAsync(discente.GetNome());
+            RelatorioServidor? relatorio = await clienteBackend.ObterRelatorioAsync(discente.GetNome());
+            btnCarregarServidor.Enabled = true;
+
+            if (sessoes == null || relatorio == null)
+            {
+                await AtualizarStatusServidorAsync();
+                MessageBox.Show("Não foi possível falar com o servidor em http://localhost:5080.\nInicie o Backend\\iniciar_backend.bat e tente de novo.",
+                    "Servidor offline", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            await AtualizarStatusServidorAsync();
+            lblRelatorio.Text =
+                $"Relatório de {relatorio.Discente}\n" +
+                $"Sessões: {relatorio.TotalSessoes} | Minutos: {relatorio.TotalMinutosEstudados} | XP: {relatorio.TotalXpAcumulado}\n" +
+                $"Meta no servidor: {relatorio.MetaMinutosSemana} min ({relatorio.PercentualMetaConcluida:0}%)\n" +
+                relatorio.StatusAcompanhamento;
+
+            lstServidor.Items.Clear();
+            foreach (SessaoServidor sessao in sessoes)
+            {
+                lstServidor.Items.Add($"{sessao.DataRegistro} | {sessao.TipoModalidade} — {sessao.Disciplina} ({sessao.DuracaoMinutos} min) +{sessao.XpGanho} XP");
+            }
         }
 
         private void BtnNotificar_Click(object? sender, EventArgs e)
